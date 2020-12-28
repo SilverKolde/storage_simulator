@@ -1,28 +1,47 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <app-input :input-lines="inputLines" @inputSelected="selectedInput">
+
+    </app-input>
+    <Output :file-list="fileList"/>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import Output from "@/components/Output";
+import Input from "@/components/Input";
 
 export default {
   name: 'App',
   components: {
-    HelloWorld
+    'app-input': Input,
+    Output
+  },
+  data() {
+    return {
+      inputLines: inputLineArray(),
+      fileList: ''
+    }
+  },
+  methods: {
+    selectedInput(fileList) {
+      this.fileList = fileList;
+    }
   }
 }
+
+function inputLineArray() {
+  return [
+    ['Esimene', 'A,2;B,3;A,-;C,4;B,+3;D,5;E,15;C,-;F,5'],
+    ['Teine', 'dsddsddsdsdsdsd'],
+    ['Kolmas', 'fddfdfdfgghtre345'],
+    ['Enda oma', 'enda oma']
+  ];
+}
+
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
+
+
 </style>
