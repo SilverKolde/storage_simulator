@@ -1,9 +1,14 @@
 <template>
   <div id="app">
-    <app-input :input-lines="inputLines" @inputSelected="inputSelected" :percents="percents">
+    <app-input :input-lines="inputLines"
+               @inputSelected="inputSelected"
+               :percents="percents"
+               @clearState="clearState">
 
     </app-input>
-    <Output :file-list="fileList" @percentsDone="passPercents"/>
+    <Output :file-list="fileList"
+            @percentsDone="passPercents"
+            :counter="counter"/>
   </div>
 </template>
 
@@ -23,7 +28,8 @@ export default {
     return {
       inputLines: inputLineArray(),
       fileList: '',
-      percents: []
+      percents: [],
+      counter: 0
     }
   },
   methods: {
@@ -32,6 +38,9 @@ export default {
     },
     passPercents(percents) {
       this.percents = percents;
+    },
+    clearState() {
+      this.counter++;
     }
   }
 }
@@ -41,6 +50,7 @@ function inputLineArray() {
     ['Esimene', 'A,2;B,3;A,-;C,4;B,+3;D,5;E,15;C,-;F,5'],
     ['Teine',   'A,4;B,3;C,6;D,5;C,+2;B,-;E,5;A,-;F,10'],
     ['Kolmas', 'A,2;B,3;C,4;D,5;B,-;E,7;D,-;E,+3;F,10'],
+    ['Neljas', 'A,4;B,3;C,6;D,5;C,+2;B,-;E,5;A,-;F,10;G,12;F,-;H,13;I,6'],
     ['Enda oma', 'enda oma']
   ];
 }

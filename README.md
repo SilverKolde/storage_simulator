@@ -1,4 +1,8 @@
-# storage_simulator
+# Storage simulator
+
+## About
+A simulator for visualizing how different files are stored on the hard disk or SSD. 
+Helps you understand how storage devices get fragmented.
 
 ## Project setup
 ```

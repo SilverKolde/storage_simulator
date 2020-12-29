@@ -1,5 +1,7 @@
 <template>
   <div class="output-container">
+<!--    There must be a nicer way to manage state, but I don't have time to dive into that right now. -->
+    <small style="display: none">We have tried {{inputCounter}} different inputs.</small>
     <p v-if="filesStr === ''">Palun valige valem.</p>
     <div v-else>
       <p>Väljund järjendile: {{ filesStr }}</p>
@@ -7,10 +9,16 @@
         <p></p>
         <div v-for="i in 48" :key="i" class="cell col-nr">{{i}}</div>
       </div>
-      <div v-for="i in files" :key="i" class="row">
+      <div v-for="i in nrOfSteps" :key="i" class="row">
         <p>Samm {{i}}</p>
         <div v-for="j in 48" :key="j" class="cell" :class="pickColor(i, j)">
-          {{ resultMatrice[i-1][j-1] }}
+          {{ resultMatrix[i - 1][j - 1] }}
+        </div>
+        <div v-if="outOfStorage && i===nrOfSteps" class="error-container">
+          Could not
+          <span v-if="outOfStorageHelper">allocate extra units for</span>
+          <span v-else>store</span>
+          file {{unstorable(i)}} at step {{i+1}}. Ran out ouf Storage space.
         </div>
       </div>
     </div>
@@ -18,135 +26,67 @@
 </template>
 
 <script>
+const MatrixMaker = require('../output logic/MatrixMaker');
+const PercentsCalculator = require('../output logic/PercentsCalculator');
+
 export default {
   name: "Output",
-  props: ['fileList'],
+  props: ['fileList', 'counter'],
   computed: {
     filesStr: function () {
       return this.fileList;
     },
-    files: function () {
+    nrOfSteps: function () {
       const files = this.fileList.split(";");
       this.calculateResult(files);
-      const percents = getPercents(this.resultMatrice);
+      const lastRow = this.resultMatrix[this.resultMatrix.length-1];
+      const percents = PercentsCalculator.getPercents(lastRow);
       this.$emit('percentsDone', percents);
-      return files.length;
+      return this.resultMatrix.length;
+    },
+    inputCounter: function () {
+      this.clearOutput();
+      return this.counter;
     }
   },
   data() {
     return {
-      resultMatrice: [[]] // to be calculated when input changes -> computed property invoked
+      resultMatrix: [[]], // input changes -> computed property invoked -> resultMatrix (re)generated
+      outOfStorage: false,
+      outOfStorageHelper: false
     }
   },
   methods: {
     calculateResult(files) {
-      this.resultMatrice = getResult(files);
+      let matrix = MatrixMaker.getResult(files);
+      if (matrix[matrix.length-1] === 'Out of storage!') {
+        this.outOfStorage = true;
+        // determine if couldn't place a new file or extend existing
+        const rowBefore = matrix[matrix.length-2];
+        const fileNotStored = files[matrix.length-1].charAt(0);
+        this.outOfStorageHelper = rowBefore.includes(fileNotStored);
+        // remove error message from matrix
+        matrix.pop();
+      }
+      this.resultMatrix = matrix;
     },
     pickColor(i, j) {
-      const fileName = this.resultMatrice[i-1][j-1];
+      const fileName = this.resultMatrix[i-1][j-1];
       const fileNames = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J'];
       const index = fileNames.indexOf(fileName);
       return "file-name" + index.toString();
+    },
+    unstorable(i) {
+      const files = this.fileList.split(';');
+      const file = files[i].split(',');
+      return file[0];
+    },
+    clearOutput() {
+      this.resultMatrix = [[]];
+      this.outOfStorage = false;
+      this.outOfStorageHelper = false;
     }
   }
-}
-
-function getResult(files) {
-  let matrice = [];
-  let n = (files === undefined) ? 9 : files.length;
-
-  for (let i = 0; i < n; i++) {
-
-    const file = files[i].split(","); // ["A", "2"] and so on
-    const name = file[0];
-    let size = file[1];
-    let action = 'allocate more units';
-
-    if (size.charAt(0) === '-'){
-      action = 'remove';
-      size = size.substring(1, size.length);
-    }
-    else if (size.charAt(0) === '+'){
-      size = size.substring(1, size.length);
-    }
-    size = parseInt(size);
-
-    let currentRow = [];
-
-    if (i===0) {
-      for (let j = 0; j < 48; j++) {
-        if (j < size) currentRow.push(name);
-        else currentRow.push("-");
-      }
-    } else {
-      const previousRow = matrice[i-1];
-      for (let j = 0; j < 48; j++) {
-        if (action === 'remove') {
-          const letter = (previousRow[j]===name) ? '-' : previousRow[j];
-          currentRow.push(letter);
-        }
-        else if (size > 0 && previousRow[j] === '-') {
-          if (previousRow[j] === '-') {
-            currentRow.push(name);
-            size--;
-          }
-        } else {
-          currentRow.push(previousRow[j]);
-        }
-      }
-    }
-    matrice.push(currentRow);
-  }
-  return matrice;
-}
-
-function getPercents(resultMatrice) {
-
-  let percents = [];
-
-  let allFiles = new Set();
-  let fragmentedFiles = new Set();
-
-  let lastRow = resultMatrice[resultMatrice.length-1]
-  for (let i = 0; i < lastRow.length; i++) {
-    const cellValue = lastRow[i];
-
-    if (i === 1) {
-      allFiles.add(cellValue)
-    } else {
-      const previousValue = lastRow[i-1];
-      if (cellValue !== previousValue) {
-        if (allFiles.has(cellValue))
-          fragmentedFiles.add(cellValue);
-        else
-          allFiles.add(cellValue);
-      }
-    }
-  }
-
-  allFiles.delete('-');
-  fragmentedFiles.delete('-');
-
-  let percent1 = Math.round((fragmentedFiles.size / allFiles.size) * 10000) / 100
-  percents.push(percent1);
-
-  let allocatedCells = 0;
-  let fragmentedCells = 0;
-
-  for (let i = 0; i < lastRow.length; i++) {
-    const cellValue = lastRow[i];
-    if (cellValue !== '-') {
-      allocatedCells++;
-      if (fragmentedFiles.has(cellValue)) {
-        fragmentedCells++;
-      }
-    }
-  }
-
-  let percent2 = Math.round(fragmentedCells / allocatedCells * 10000) / 100
-  percents.push(percent2)
-
-  return percents
 }
 </script>
 
@@ -180,9 +120,23 @@ function getPercents(resultMatrice) {
     box-shadow:         1px 1px 2px 2px #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
   }
 
+  .error-container {
+    padding: 5px 10px;
+    margin-top: 10px;
+    margin-left: 75px;
+    background-color: #E64A19;
+    border-radius: 5px;
+    max-width: 1180px;
+    border: 1px solid rgba(0,1,4,0.8);
+    text-align: center;
+    -webkit-box-shadow: 1px 1px 2px 2px #ccc;  /* Safari 3-4, iOS 4.0.2 - 4.2, Android 2.3+ */
+    -moz-box-shadow:    1px 1px 2px 2px #ccc;  /* Firefox 3.5 - 3.6 */
+    box-shadow:         1px 1px 2px 2px #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
+  }
+
+
 
   /* Dont look down! It will burn your eyes! */
-
 
 
   .file-name0 {

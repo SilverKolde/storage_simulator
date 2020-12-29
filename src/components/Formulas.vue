@@ -16,6 +16,9 @@ export default {
   props: ['inputLines'],
   methods: {
     selectInput(fileList) {
+      // Firstly we'll restore original state of Output component
+      this.$emit('clearState')
+      // Then we'll pass the list of files to be stored
       fileList = (fileList !== 'enda oma') ? fileList : document.querySelector("input[name=custom]").value
       this.$emit('inputSelected', fileList)
     }

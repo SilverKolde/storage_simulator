@@ -1,6 +1,6 @@
 <template>
   <div id="top">
-    <formulas :inputLines="inputLines" @inputSelected="inputSelected"/>
+    <formulas :inputLines="inputLines" @inputSelected="inputSelected" @clearState="clearState"/>
     <calculations :percents="passPercents"/>
   </div>
 </template>
@@ -24,6 +24,9 @@ export default {
   methods: {
     inputSelected(fileList) {
       this.$emit('inputSelected', fileList)
+    },
+    clearState() {
+      this.$emit('clearState')
     }
   }
 }
