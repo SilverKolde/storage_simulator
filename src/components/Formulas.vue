@@ -1,10 +1,10 @@
 <template>
-  <div id="main-container">
-    <p>Vali või sisesta järjend (kujul A,2;B,3;A,-;C,4;B,+3;D,5;E,15;C,-;F,5). Max 10 faili.</p>
-    <div v-for="(line, index) in inputLines" :key="index" class="line">
+  <div id="container">
+    <p>Select or insert the list of files (pattern A,2;B,3;A,-;C,4;B,+3;D,5;E,15;C,-;F,5).</p>
+    <div v-for="(line, index) in inputLines" :key="index">
       <input type="radio" @click="selectInput(line[1])" name="formula">
-      <span>{{line[0]}}</span>
-      <span v-if="line[1]==='enda oma'" ><input type="text" name="custom"/></span>
+      <span class="label">{{line[0]}}</span>
+      <span v-if="line[1]==='custom'" ><input type="text" name="custom"/></span>
       <span v-else >{{ line[1] }}</span>
     </div>
   </div>
@@ -19,7 +19,7 @@ export default {
       // Firstly we'll restore original state of Output component
       this.$emit('clearState')
       // Then we'll pass the list of files to be stored
-      fileList = (fileList !== 'enda oma') ? fileList : document.querySelector("input[name=custom]").value
+      fileList = (fileList !== 'custom') ? fileList : document.querySelector("input[name=custom]").value
       this.$emit('inputSelected', fileList)
     }
   }
@@ -27,7 +27,14 @@ export default {
 </script>
 
 <style scoped>
-  .line > span {
-    margin-left: 20px;
+  .label{
+    margin: 0 20px;
+    display: inline-block;
+    min-width: 60px;
+  }
+
+  #container {
+    width: 50%;
+    margin: 20px;
   }
 </style>

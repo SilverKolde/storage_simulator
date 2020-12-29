@@ -2,15 +2,15 @@
   <div class="output-container">
 <!--    There must be a nicer way to manage state, but I don't have time to dive into that right now. -->
     <small style="display: none">We have tried {{inputCounter}} different inputs.</small>
-    <p v-if="filesStr === ''">Palun valige valem.</p>
+    <p v-if="filesStr === ''">Please select an algorithm.</p>
     <div v-else>
-      <p>Väljund järjendile: {{ filesStr }}</p>
+      <p>Output for the following list of files: {{ filesStr }}</p>
       <div class="row">
         <p></p>
         <div v-for="i in 48" :key="i" class="cell col-nr">{{i}}</div>
       </div>
       <div v-for="i in nrOfSteps" :key="i" class="row">
-        <p>Samm {{i}}</p>
+        <p>Step {{i}}</p>
         <div v-for="j in 48" :key="j" class="cell" :class="pickColor(i, j)">
           {{ resultMatrix[i - 1][j - 1] }}
         </div>

@@ -43,8 +43,4 @@ export default {
     -moz-box-shadow:    1px 1px 2px 2px #ccc;  /* Firefox 3.5 - 3.6 */
     box-shadow:         1px 1px 2px 2px #ccc;  /* Opera 10.5, IE 9, Firefox 4+, Chrome 6+, iOS 5 */
   }
-  #main-container {
-    width: 50%;
-    margin: 20px;
-  }
 </style>

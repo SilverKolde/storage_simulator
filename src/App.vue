@@ -16,8 +16,6 @@
 import Output from "@/components/Output";
 import Input from "@/components/Input";
 
-//TODO  Mis saab siis kui ruumi pole??
-
 export default {
   name: 'App',
   components: {
@@ -47,11 +45,11 @@ export default {
 
 function inputLineArray() {
   return [
-    ['Esimene', 'A,2;B,3;A,-;C,4;B,+3;D,5;E,15;C,-;F,5'],
-    ['Teine',   'A,4;B,3;C,6;D,5;C,+2;B,-;E,5;A,-;F,10'],
-    ['Kolmas', 'A,2;B,3;C,4;D,5;B,-;E,7;D,-;E,+3;F,10'],
-    ['Neljas', 'A,4;B,3;C,6;D,5;C,+2;B,-;E,5;A,-;F,10;G,12;F,-;H,13;I,6'],
-    ['Enda oma', 'enda oma']
+    ['First', 'A,2;B,3;A,-;C,4;B,+3;D,5;E,15;C,-;F,5'],
+    ['Second',   'A,4;B,3;C,6;D,5;C,+2;B,-;E,5;A,-;F,10'],
+    ['Third', 'A,2;B,3;C,4;D,5;B,-;E,7;D,-;E,+3;F,10'],
+    ['Fourth', 'A,4;B,3;C,6;D,5;C,+2;B,-;E,5;A,-;F,10;G,12;F,-;H,13;I,6'],
+    ['Insert', 'custom']
   ];
 }
 
