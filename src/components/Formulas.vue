@@ -37,4 +37,8 @@ export default {
     width: 50%;
     margin: 20px;
   }
+
+  input[type=text] {
+    width: 250px
+  }
 </style>

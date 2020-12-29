@@ -26,8 +26,8 @@
 </template>
 
 <script>
-const MatrixMaker = require('../output logic/MatrixMaker');
-const PercentsCalculator = require('../output logic/PercentsCalculator');
+const MatrixMaker = require('../logic/MatrixMaker');
+const PercentsCalculator = require('../logic/PercentsCalculator');
 
 export default {
   name: "Output",
